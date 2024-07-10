@@ -1,0 +1,8 @@
+*.jpg
+*.JPEG
+*.JPG
+*.jpeg
+__pycache__
+*.tar
+server_and_model/modules/saved_models/plant_village
+server_and_model/modules/data

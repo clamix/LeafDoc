@@ -122,21 +122,22 @@ def load_data(resize):
 
     data_transforms = {
         'train': transforms.Compose([
-            transforms.RandomSizedCrop(max(resize)),
+            transforms.RandomResizedCrop(max(resize)),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
         'val': transforms.Compose([
             #Higher scale-up for inception
-            transforms.Scale(int(max(resize)/224*256)),
+            transforms.Resize(int(max(resize)/224*256)),
             transforms.CenterCrop(max(resize)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
     }
 
-    data_dir = 'data/PlantVillage'
+    #data_dir = 'data/PlantVillage'
+    data_dir = 'data/max'
     dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
              for x in ['train', 'val']}
     dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=batch_size,
@@ -178,7 +179,7 @@ def train(net, trainloader, param_list=None, epochs=15):
             # get the inputs
             inputs, labels = data
             if use_gpu:
-                inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda(async=True))
+                inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda(non_blocking=True))
             else:
                 inputs, labels = Variable(inputs), Variable(labels)
 
@@ -212,15 +213,15 @@ def train(net, trainloader, param_list=None, epochs=15):
     return losses
 
 def save_model(net):
-    if not os.path.exists("Saved_Models/plant_village"):
-        os.mkdir("Saved_Models/plant_village")
+    if not os.path.exists("saved_models/plant_village"):
+        os.mkdir("saved_models/plant_village")
     state_dic = {'task_name': "Plant_Village", 'state_dict': net.state_dict()}
-    filename = "Saved_Models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar"
+    filename = "saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar"
     torch.save(state_dic, filename)
     print("Model Saved")
 
 def load_model(net):
-    filename = "Saved_Models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar"      # Loading for testing
+    filename = "saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar"      # Loading for testing
     checkpoint = torch.load(filename)
     net.load_state_dict(checkpoint['state_dict'])
     return net.eval()
@@ -262,7 +263,7 @@ def evaluate_stats(net, testloader):
         outputs = net(Variable(images))
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
-        correct += (predicted.cpu().numpy().astype(np.int) == labels.numpy().astype(np.int)).sum()
+        correct += (predicted.cpu().numpy().astype(int) == labels.numpy().astype(int)).sum()
     print("Correct:", correct)
     print("Total:", total)
     accuracy = float(correct) / float(total)
@@ -284,7 +285,7 @@ def train_eval(net, trainloader, testloader, param_list=None):
     return {**stats_train, **stats_eval}
 
 stats = []
-num_classes = 39
+num_classes = 7 
 print("RETRAINING")
 
 for name in models_to_test:

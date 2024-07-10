@@ -79,6 +79,17 @@ def diff_states(dict_canonical, dict_subset):
         if v1.size() != v2.size():
             yield (name, v1)                
 
+def change_key_prefix(d, old_prefix, new_prefix):
+    new_dict = {}
+    for key, value in d.items():
+        if key.startswith(old_prefix):
+            new_key = new_prefix + key[len(old_prefix):]
+        else:
+            new_key = key
+        new_dict[new_key] = value
+    return new_dict
+
+
 def load_defined_model(name, num_classes):
     
     model = models.__dict__[name](num_classes=num_classes)
@@ -89,7 +100,8 @@ def load_defined_model(name, num_classes):
                                             block_config=(6, 12, 32, 32), num_classes=num_classes)
         
     pretrained_state = model_zoo.load_url(model_urls[name])
-
+    #pretrained_state=torch.load("./saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar.old")["state_dict"]
+    #pretrained_state= change_key_prefix(pretrained_state,"module.","")
     #Diff
     diff = [s for s in diff_states(model.state_dict(), pretrained_state)]
     print("Replacing the following state from initialized", name, ":", \
@@ -122,21 +134,22 @@ def load_data(resize):
 
     data_transforms = {
         'train': transforms.Compose([
-            transforms.RandomSizedCrop(max(resize)),
+            transforms.RandomResizedCrop(max(resize)),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
         'val': transforms.Compose([
             #Higher scale-up for inception
-            transforms.Scale(int(max(resize)/224*256)),
+            transforms.Resize(int(max(resize)/224*256)),
             transforms.CenterCrop(max(resize)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
     }
 
-    data_dir = 'data/PlantVillage'
+    #data_dir = 'data/PlantVillage'
+    data_dir = 'data/max'
     dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
              for x in ['train', 'val']}
     dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=batch_size,
@@ -144,7 +157,7 @@ def load_data(resize):
                     for x in ['train', 'val']}
     dset_sizes = {x: len(dsets[x]) for x in ['train', 'val']}
     dset_classes = dsets['train'].classes
-    
+    print(dset_classes) 
     return dset_loaders['train'], dset_loaders['val']
 
 def train(net, trainloader, param_list=None, epochs=15):
@@ -179,7 +192,7 @@ def train(net, trainloader, param_list=None, epochs=15):
             # get the inputs
             inputs, labels = data
             if use_gpu:
-                inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda(async=True))
+                inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda(non_blocking=True))
             else:
                 inputs, labels = Variable(inputs), Variable(labels)
 
@@ -258,7 +271,7 @@ def evaluate_stats(net, testloader):
         images, labels = data
 
         if use_gpu:
-            images, labels = (images.cuda()), (labels.cuda(async=True))
+            images, labels = (images.cuda()), (labels.cuda(non_blocking=True))
 
         outputs = net(Variable(images))
         _, predicted = torch.max(outputs.data, 1)
@@ -282,7 +295,7 @@ def train_eval(net, trainloader, testloader, param_list=None):
     return {**stats_train, **stats_eval}
 
 stats = []
-num_classes = 39
+num_classes = 7 
 print("RETRAINING")
 
 for name in models_to_test:
