@@ -79,16 +79,6 @@ def diff_states(dict_canonical, dict_subset):
         if v1.size() != v2.size():
             yield (name, v1)                
 
-def change_key_prefix(d, old_prefix, new_prefix):
-    new_dict = {}
-    for key, value in d.items():
-        if key.startswith(old_prefix):
-            new_key = new_prefix + key[len(old_prefix):]
-        else:
-            new_key = key
-        new_dict[new_key] = value
-    return new_dict
-
 
 def load_defined_model(name, num_classes):
     
@@ -99,9 +89,11 @@ def load_defined_model(name, num_classes):
         model = torchvision.models.DenseNet(num_init_features=64, growth_rate=32, \
                                             block_config=(6, 12, 32, 32), num_classes=num_classes)
         
-    pretrained_state = model_zoo.load_url(model_urls[name])
-    #pretrained_state=torch.load("./saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar.old")["state_dict"]
-    #pretrained_state= change_key_prefix(pretrained_state,"module.","")
+    #pretrained_state = model_zoo.load_url(model_urls[name])  # from original pretrained model
+    pretrained_state=torch.load("./saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar.old")["state_dict"] # from fine-tuned model with plant_village data
+    #remove prefix "module." in saved model because it is added automativcally by DataParallel
+    pretrained_state = {k.removeprefix('module.'): v for k,v in pretrained_state.items()} 
+
     #Diff
     diff = [s for s in diff_states(model.state_dict(), pretrained_state)]
     print("Replacing the following state from initialized", name, ":", \
