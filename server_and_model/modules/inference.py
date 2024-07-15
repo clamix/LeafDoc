@@ -36,7 +36,7 @@ class predict_class():
         dirlist.sort()
         for n in range(self.num_classes):
             self.idx_to_name[n]=dirlist[n]
-            #print(n,dirlist[n])
+            print(n,dirlist[n])
             #self.idx_to_name[n]=str(n) 
         #self.idx_to_name[28] = "Tomato Bacterial Spot"
         #self.idx_to_name[29] = "Tomato Early Blight"

@@ -222,7 +222,7 @@ def save_model(net):
 
 def load_model(net):
     filename = "saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar"      # Loading for testing
-    checkpoint = torch.load(filename)
+    checkpoint = torch.load(filename,map_location="cpu")
     net.load_state_dict(checkpoint['state_dict'])
     return net.eval()
 
