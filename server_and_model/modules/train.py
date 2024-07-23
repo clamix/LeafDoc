@@ -56,7 +56,10 @@ models_to_test = ['squeezenet1_1']  # Only want to work with squeeze net current
 
 batch_size = 20
 use_gpu = torch.cuda.is_available()
-
+if (use_gpu is True):
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
 #Generic pretrained model loading
 
 #We solve the dimensionality mismatch between
@@ -90,7 +93,7 @@ def load_defined_model(name, num_classes):
                                             block_config=(6, 12, 32, 32), num_classes=num_classes)
         
     #pretrained_state = model_zoo.load_url(model_urls[name])  # from original pretrained model
-    pretrained_state=torch.load("./saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar.old")["state_dict"] # from fine-tuned model with plant_village data
+    pretrained_state=torch.load("./saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar.old",  map_location=device )["state_dict"] # from fine-tuned model with plant_village data
     #remove prefix "module." in saved model because it is added automativcally by DataParallel
     pretrained_state = {k.removeprefix('module.'): v for k,v in pretrained_state.items()} 
 
