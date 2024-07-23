@@ -19,7 +19,4 @@ Greendoc(https://github.com/deepcpatel/GreenDoc) 프로젝트를 clone하여 개
 2. Take-Picture(https://github.com/Mr-Sepehr-sa/Take-Picture) 을 참고하여 Android app을 다시 개발함
 
 ## reference
-[1] “[1602.07360] SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size”.  [Online]. Available at: https://arxiv.org/abs/1602.07360
-
-
-
+[1] F. N. Iandola, S. Han, M. W. Moskewicz, K. Ashraf, W. J. Dally, and K. Keutzer, “SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size,” Nov. 04, 2016, arXiv: arXiv:1602.07360. Accessed: Jul. 23, 2024. [Online]. Available: http://arxiv.org/abs/1602.07360
