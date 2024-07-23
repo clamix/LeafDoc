@@ -6,7 +6,8 @@
 
 ## 모티브
 세계 인구가 급속도로 증가하고 있으며 이를 지원하기 위해 충분한 식량 자원이 필요합니다. 그러나 기후 변화, 오염 및 식물 질병과 같은 식량 생산의 심각한 문제들이 발생하고 있습니다. 우리는 스마트폰을 유용하게 사용하여 식물 질병을 즉각적으로 감지하고 치료 방법을 제시해 질병을 치료하고 퍼지는 것을 방지할 수 있다고 생각하여 인류에 이바지 할 수 있다고 생각하였습니다. 
-위의 아이어를 구현하기 위해 유사 프로젝트를 찾던중 
+
+위의 아이디어를 구현하기 위해 유사 프로젝트를 찾던중 
 Greendoc(https://github.com/donmccurdy/greendoc) 프로젝트를 clone하여 개발을 시작하였습니다.
 
 ## 문제점
@@ -16,5 +17,9 @@ Greendoc(https://github.com/donmccurdy/greendoc) 프로젝트를 clone하여 개
 ## 해결방법
 1. 데이터 부족을 극복하기 위해 Plantvillege 데이터 셋으로 학습된 Sqeezenet을 하여 transfer learning을 함
 2. Take-Picture(https://github.com/Mr-Sepehr-sa/Take-Picture) 을 참고하여 Android app을 다시 개발함
+
+## reference
+[1] “[1602.07360] SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size”.  [Online]. Available at: https://arxiv.org/abs/1602.07360
+
 
 
