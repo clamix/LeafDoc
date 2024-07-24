@@ -4,6 +4,6 @@ RUN pip3 install torch torchvision --index-url https://download.pytorch.org/whl/
 RUN pip3 install flask
 RUN mkdir /app
 COPY . /app
-WORKDIR /app/server_and_model
+WORKDIR /app
 ENTRYPOINT ["python","server.py"]
 
