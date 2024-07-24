@@ -16,7 +16,7 @@ Greendoc(https://github.com/deepcpatel/GreenDoc) 프로젝트를 clone하여 개
 2. Greendoc은 예전 android 버전으로 개발되어 최신 개발환경에서 build가 불가능함
 
 ## 해결방법
-1. 데이터 부족을 극복하기 위해 Plantvillege 데이터 셋으로 학습된 Sqeezenet을 하여 transfer learning을 함
+1. 데이터 부족을 극복하기 위해 Plantvillege 데이터 셋으로 학습된 SqeezeNet을 수집한 데이터로 다시 한번 transfer learning 함
 2. Take-Picture(https://github.com/Mr-Sepehr-sa/Take-Picture) 을 참고하여 Android app을 다시 개발함
 
 ## References
