@@ -13,7 +13,7 @@ Greendoc(https://github.com/deepcpatel/GreenDoc) 프로젝트를 clone하여 개
 
 ## 문제점
 1. 병충해 걸린 잎을 구하기가 어려워 데이터가 너무 적게 수집됨
-2. Greendoc은 예전 android 버전으로 개발되어 최신 개발환경에서 build가 불가능함
+2. Greendoc에 포함 android 앱은 오래되어 최신 개발환경에서 build가 불가능함
 
 ## 해결방법
 1. 데이터 부족을 극복하기 위해 Plantvillege 데이터 셋으로 학습된 SqeezeNet을 수집한 데이터로 다시 한번 transfer learning 함
