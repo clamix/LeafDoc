@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name" translatable="false">Leaf Doctor</string>
+    <string name="description1" translatable="false">By Plantnet\n*************************\n</string>
+    <string name="description2" translatable="false">\nMax,Clamix</string>
+    <string name="description3" translatable="false">\n\n* 장미나무, 고무나무의 잎을 촬영하면 병충해의 원인, 치료법을 알려 줍니다.\n\n</string>
+    <string name="description4" translatable="false">* 이 프로그램은 공개 소프트웨어 입니다.\n</string>
+    <string name="diagnosing" translatable="true">Diagnosing.....</string>
+    <string name="preview" translatable="true">Preview Image</string>
+    <string name="button_desc" translatable="true">Take a photo</string>
+    <string name="check_another" translatable="true">Check Another</string>
+    <string name="test" translatable="true">Error</string>
+    <string name="cause" translatable="true">Cause:</string>
+    <string name="remedy" translatable="true">Remedies:</string>
+</resources>
+

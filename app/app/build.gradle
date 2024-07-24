@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.application'
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+def localProperties = new Properties()
+localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+
+android {
+    defaultConfig {
+        applicationId "kr.hs.kyunggi.plantnet.leafdoctor"
+        minSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        configureEach {
+            buildConfigField("String", "SERVER", "" + localProperties['SERVER'] + "")
+            buildConfigField("String", "TEAM", "" + localProperties['TEAM'] + "")
+            buildConfigField("String", "AUTHOR", "" + localProperties['AUTHOR'] + "")
+            buildConfigField("String", "DESC", "" + localProperties['DESC'] + "")
+        }
+
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    namespace 'kr.hs.kyunggi.plantnet.leafdoctor'
+    compileSdk 35
+    buildFeatures {
+        viewBinding true
+        buildConfig=true
+    }
+
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+}
