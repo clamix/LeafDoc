@@ -1,0 +1,10 @@
+version: "3"
+services:
+  leafdoctor:
+    image: leafdoc 
+    container_name: leafdoc 
+    environment:
+      - TZ=Asis/Seoul
+    ports:
+      - 8001:8001/tcp
+    restart: unless-stopped
