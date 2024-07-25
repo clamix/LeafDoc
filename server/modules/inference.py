@@ -59,7 +59,7 @@ class predict_class():
         # Look at issue: 'https://discuss.pytorch.org/t/1686/4' for following snippet
         new_state_dict = OrderedDict()  # Used because pretrained weights are saved using DataParallel
         for k, v in checkpoint['state_dict'].items():
-            name = k[7:]            # remove `module.`
+            name = k.removeprefix("module.")             # remove `module.`
             new_state_dict[name] = v
 
         self.net.load_state_dict(new_state_dict)    
