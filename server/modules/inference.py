@@ -50,7 +50,7 @@ class predict_class():
         #self.idx_to_name[37] = "Healthy"
     
     def load_model(self):   # Function to load pre-trained Squeeze Net model
-        filename = os.path.join(self.home_path, "saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar")      # Loading for testing
+        filename = os.path.join(self.home_path, "saved_models/Plant_Village_Squeeze_Net_Finetuned.pth")      # Loading for testing
         self.net = models.__dict__['squeezenet1_1'](num_classes=self.num_classes)                   # Loading Squeeze Net Model
 
         # Loading Pre-Trained weights into the model

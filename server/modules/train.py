@@ -18,6 +18,9 @@ from torchvision import datasets
 from itertools import accumulate
 from functools import reduce
 
+# if fine_tuning is true, then transfer-learning from old weight filws. 
+fine_tuning=True
+only_eval=False
 #configuration
 model_urls = {
     'alexnet': 'https://download.pytorch.org/models/alexnet-owt-4df8aa71.pth',
@@ -54,7 +57,7 @@ input_sizes = {
 # models_to_test = ['alexnet', 'densenet169', 'inception_v3', 'resnet34', 'squeezenet1_1', 'vgg13']
 models_to_test = ['squeezenet1_1']  # Only want to work with squeeze net currently. Uncomment if want to work further
 
-batch_size = 20
+batch_size = 2000
 use_gpu = torch.cuda.is_available()
 if (use_gpu is True):
     device = torch.device("cuda")
@@ -91,9 +94,12 @@ def load_defined_model(name, num_classes):
     if name == 'densenet169':
         model = torchvision.models.DenseNet(num_init_features=64, growth_rate=32, \
                                             block_config=(6, 12, 32, 32), num_classes=num_classes)
-        
-    #pretrained_state = model_zoo.load_url(model_urls[name])  # from original pretrained model
-    pretrained_state=torch.load("./saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar.old",  map_location=device )["state_dict"] # from fine-tuned model with plant_village data
+    pretrained_state = None
+    if fine_tuning is False:
+        pretrained_state = model_zoo.load_url(model_urls[name])  # from original pretrained model
+    else :
+        pretrained_state=torch.load("./saved_models/Plant_Village_Squeeze_Net.pth",  map_location=device )["state_dict"] # from fine-tuned model with plant_village data
+    
     #remove prefix "module." in saved model because it is added automativcally by DataParallel
     pretrained_state = {k.removeprefix('module.'): v for k,v in pretrained_state.items()} 
 
@@ -142,9 +148,11 @@ def load_data(resize):
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
     }
-
-    #data_dir = 'data/PlantVillage'
-    data_dir = 'data/max'
+    data_dir=None
+    if fine_tuning is False:
+        data_dir = 'data/PlantVillage'
+    else:
+        data_dir = 'data/max'
     dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
              for x in ['train', 'val']}
     dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=batch_size,
@@ -221,17 +229,31 @@ def train(net, trainloader, param_list=None, epochs=15):
     return losses
 
 def save_model(net):
-    if not os.path.exists("saved_models/plant_village"):
-        os.mkdir("saved_models/plant_village")
+    if not os.path.exists("saved_models"):
+        os.mkdir("saved_models")
     state_dic = {'task_name': "Plant_Village", 'state_dict': net.state_dict()}
-    filename = "./saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar"
+    filename = None
+    if fine_tuning is False:
+        filename = "./saved_models/Plant_Village_Squeeze_Net.pth"
+    else:
+        filename = "./saved_models/Plant_Village_Squeeze_Net_Finetuned.pth"
+        
     torch.save(state_dic, filename)
     print("Model Saved")
 
 def load_model(net):
-    filename = "./saved_models/plant_village/Plant_Village_saved_model_Squeeze_Net.pth.tar"      # Loading for testing
-    checkpoint = torch.load(filename)
-    net.load_state_dict(checkpoint['state_dict'])
+    filename = None
+    if fine_tuning is False:
+        filename = "./saved_models/Plant_Village_Squeeze_Net.pth" 
+    else:
+        filename = "./saved_models/Plant_Village_Squeeze_Net_Finetuned.pth"
+
+
+    checkpoint = torch.load(filename,map_location=device)['state_dict']
+    if  not (use_gpu):
+        checkpoint =  { k.removeprefix('module.'): v for k,v in checkpoint.items()} # for cpu 
+    net.load_state_dict(checkpoint)
+    
     return net.eval()
 
 #Get stats for training and evaluation in a structured way
@@ -272,7 +294,9 @@ def evaluate_stats(net, testloader):
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum()
-    accuracy = correct / total
+    print("Correct:", int(correct))
+    print("Total:", int(total))
+    accuracy = float(correct) / float(total)
     stats['accuracy'] = accuracy
     stats['eval_time'] = time.time() - before
     
@@ -281,16 +305,26 @@ def evaluate_stats(net, testloader):
 
 def train_eval(net, trainloader, testloader, param_list=None):
     print("Training..." if not param_list else "Retraining...")
-    stats_train = train_stats(net, trainloader, param_list=param_list)
+    stats_train = {}
+    if only_eval is False:
+        stats_train = train_stats(net, trainloader, param_list=param_list)
     
     print("Evaluating...")
-    net = net.eval()
+    if only_eval is False:
+        net = net.eval()
+    else:
+        net = load_model(net)
+    
     stats_eval = evaluate_stats(net, testloader)
     
     return {**stats_train, **stats_eval}
 
 stats = []
-num_classes = 7 
+num_classes = 0
+if fine_tuning is False:
+    num_classes = len(os.listdir("data/PlantVillage/train"))
+else:
+    num_classes = len(os.listdir("data/max/train"))
 print("RETRAINING")
 
 for name in models_to_test:
@@ -316,6 +350,16 @@ for name in models_to_test:
     stats.append(pretrained_stats)
     
     print("")
+    #Export stats as .csv
+    import csv
+    with open('stats.csv', 'w') as csvfile:
+        fieldnames = stats[0].keys()
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for s in stats:
+            writer.writerow(s)
+
 
 exit()  # Remove this to train Further
 
@@ -374,12 +418,3 @@ for name in models_to_test:
     print("")
 
 
-#Export stats as .csv
-import csv
-with open('stats.csv', 'w') as csvfile:
-    fieldnames = stats[0].keys()
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-    writer.writeheader()
-    for s in stats:
-        writer.writerow(s)

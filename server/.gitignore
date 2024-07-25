@@ -1,4 +1,6 @@
 *.jpg
+*.png
+*.PNG
 *.JPEG
 *.JPG
 *.jpeg
@@ -6,4 +8,6 @@ __pycache__
 *.tar
 *.old
 *.pth
+*.swp
+*.csv
 
