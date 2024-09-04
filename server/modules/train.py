@@ -57,7 +57,7 @@ input_sizes = {
 # models_to_test = ['alexnet', 'densenet169', 'inception_v3', 'resnet34', 'squeezenet1_1', 'vgg13']
 models_to_test = ['squeezenet1_1']  # Only want to work with squeeze net currently. Uncomment if want to work further
 
-batch_size = 2000
+batch_size = 200
 use_gpu = torch.cuda.is_available()
 if (use_gpu is True):
     device = torch.device("cuda")
