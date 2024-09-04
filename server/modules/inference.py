@@ -19,7 +19,7 @@ from PIL import Image
 
 class predict_class():
     def __init__(self, home_path = "./"):
-        self.num_classes =7     # Number of Classes
+        self.num_classes =12      # Number of Classes
         self.net = None          # Stores Network model
         self.resize = (224, 224) # Image resize
         self.image_transform = transforms.Compose([transforms.Resize(256), transforms.CenterCrop(max(self.resize)), transforms.ToTensor(),
